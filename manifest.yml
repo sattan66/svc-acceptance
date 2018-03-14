@@ -2,6 +2,6 @@ applications:
 - name: smoke-test-app
   memory: 768M
   instances: 1
-  host: smoke-test-app-${randon-word}
+  host: smoke-test-app-${random-word}
   services:
   - service-instance
