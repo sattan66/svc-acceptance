@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eu
+set -xe
 
 echo "hello"
 
@@ -11,6 +11,8 @@ cf login -u $USER -p $PASSWORD -o "$ORG" -s "$SPACE"
 echo "cf login done"
 
 SERVICE_INSTANCE=smk-test-$SERVICE
+
+echo "$SERVICE_INSTANCE" 
 cf create-service $SERVICE $PLAN $SERVICE_INSTANCE > changes-status.txt
 
 echo " cf service created"
