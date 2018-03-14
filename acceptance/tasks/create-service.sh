@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -xe
+set -eu
 
 echo "hello"
 
