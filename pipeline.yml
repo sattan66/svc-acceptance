@@ -1,0 +1,53 @@
+resources:
+    
+- name: git-repo
+  type: git
+  source:
+    uri: https://github.com/srinivasa-vasu/cf-workshop-spring-boot.git
+    branch: master
+    
+- name: artifacts
+  type: s3
+  source:
+    bucket: cn-pcf-bkt
+    region_name: default
+    access_key_id: {{s3_access_key}}
+    secret_access_key: {{s3_access_secret}}
+    endpoint: {{s3_endpoint}}
+    regexp: releases/{{cf_app}}-(.*).jar
+
+- name: cf-deploy
+  type: cf
+  source:
+    api: {{cf_api}}
+    skip_cert_check: true
+    organization: {{cf_organization}}
+    username: {{cf_username}}
+    password: {{cf_password}}
+    space: {{cf_space}}
+    
+jobs:
+
+- name: svc-acceptance-test
+  serial: true
+  public: true
+  plan:
+  - get: git-repo
+    trigger: true
+  - get: artifacts
+  - task: do-create-svc
+    file: git-repo/service-acceptance/tasks/create-service.yml
+    params:
+      API: {{cf_api}}
+      ORG: {{cf_organization}}
+      USER: {{cf_username}}
+      PASSWORD: {{cf_password}}
+      SPACE: {{cf_space}}
+      SERVICE: {{cf_service}}
+      PLAN: {{cf_plan}}
+  - task: prepare-app-manifest
+    file: git-repo/service-acceptance/tasks/app-manifest-prep.yml
+  - put: cf-dev
+    params:
+      manifest: app-manifest-output/manifest.yml
+      path: artifacts/{{cf_app}}-*.jar
